@@ -13,7 +13,7 @@
 metadata:
   version: "1.0.0"
   schema_version: "1.0"
-  last_updated: "17-08-2026"
+  last_updated: "17-09-2026"
   description: "Shadow Linux Hardening Tool Configuration"
 
 # --------------------------------------------
@@ -23,13 +23,13 @@ general:
   # Auto-fix mode - false means only report, true means ask permission
   auto_fix: false
   
-  # MEDIUM FIX 1: Dry-run mode (preview changes without applying)
+  # Dry-run mode (preview changes without applying)
   dry_run: false
   
-  # MEDIUM FIX 2: Safe mode (skip dangerous operations)
+  # Safe mode (skip dangerous operations)
   safe_mode: false
   
-  # MEDIUM FIX 3: Log level (DEBUG, INFO, WARNING, ERROR)
+  # Log level (DEBUG, INFO, WARNING, ERROR)
   log_level: "INFO"
   
   # Verbose logging - more detailed logs
@@ -41,11 +41,18 @@ general:
   # Maximum parallel checks (for performance)
   max_parallel: 4
   
-  # Timeout for operations (seconds)
+  # Global timeout for operations (seconds)
   timeout: 300
   
   # Force mode (bypass auto_fix check)
   force: false
+
+# --------------------------------------------
+# SCAN SETTINGS (CRITICAL FOR PERFORMANCE)
+# --------------------------------------------
+scan:
+  # Module timeout in seconds (increased to 120s to prevent change_detection timeout on large systems)
+  module_timeout: 120
 
 # --------------------------------------------
 # MODULE ENABLED/DISABLED
@@ -164,7 +171,7 @@ password:
   require_digit: true
   require_special: true
   
-  # Failed login lockout (YOUR FEATURE)
+  # Failed login lockout (Brute-force protection)
   max_attempts: 3
   lockout_time: 600  # seconds (10 minutes)
 
@@ -301,8 +308,8 @@ integrity:
   # Hash monitoring
   hash_monitoring: true
   
-  # Change detection
-  change_detection: false
+  # Change detection (ENABLED for FIM)
+  change_detection: true
   
   # Sensitive directories to monitor
   sensitive_dirs:
@@ -435,7 +442,7 @@ reporting:
   # Save reports to /var/log/shadow/reports/
   save: true
   
-  # MEDIUM FIX 4: Report retention (number of reports to keep)
+  # Report retention (number of reports to keep)
   retention_count: 30
   
   # Report retention (days)
