@@ -120,6 +120,9 @@ do_uninstall() {
     rm -f /etc/shadow-tool/shadow.yml
     rmdir /etc/shadow-tool 2>/dev/null || true
     
+    # Remove sudoers path fix
+    rm -f /etc/sudoers.d/secure_path_local
+    
     # Ask about removing logs and backups
     echo -e "${YELLOW}Remove logs and backups? (y/N)${NC}"
     read -r response
@@ -151,9 +154,10 @@ if [ "$DRY_RUN" = true ]; then
     echo "  5. Install configuration to /etc/shadow-tool/"
     echo "  6. Install Python dependencies (including PDF support)"
     echo "  7. Create executable /usr/local/bin/shadow"
-    echo "  8. Install systemd service"
-    echo "  9. Create log and backup directories"
-    echo "  10. Set permissions"
+    echo "  8. Configure sudo secure path for Kali/Ubuntu"
+    echo "  9. Install systemd service"
+    echo "  10. Create log and backup directories"
+    echo "  11. Set permissions"
     echo ""
     echo -e "${GREEN}✅ Dry run complete. No changes were made.${NC}"
     exit 0
@@ -494,6 +498,19 @@ EOF
 
 chmod +x /usr/local/bin/shadow
 echo -e "${GREEN}Executable created: /usr/local/bin/shadow${NC}"
+
+# ============================================================
+# ✅ FIX 5: CONFIGURE SUDO SECURE PATH FOR KALI/UBUNTU
+# ============================================================
+# Kali and some Ubuntu versions restrict sudo to specific paths.
+# This ensures 'sudo shadow' works globally without 'command not found'.
+SUDOERS_FILE="/etc/sudoers.d/secure_path_local"
+if [ ! -f "$SUDOERS_FILE" ]; then
+    echo -e "${YELLOW}Configuring sudo secure path for /usr/local/bin...${NC}"
+    echo 'Defaults secure_path="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"' > "$SUDOERS_FILE"
+    chmod 440 "$SUDOERS_FILE"
+    echo -e "${GREEN}Sudo secure path configured successfully.${NC}"
+fi
 
 # ============================================================
 # INSTALL SYSTEMD SERVICE
